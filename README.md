@@ -1,5 +1,7 @@
 # vue-tonejs
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e3927fc0-f8a5-4884-a3f3-cbf46f2be468/deploy-status)](https://vue-tonejs-test.netlify.app/)
+
 ## Project setup
 ```
 yarn install
