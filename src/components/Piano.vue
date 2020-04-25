@@ -10,6 +10,7 @@
             </piano-key>
         </div>
         <p class="controls">
+            oscillator waveform:
             <v-radio-group v-model="selectedWaveform" row>
                 <template v-for="waveform in waveforms">
                     <v-radio :label="waveform" :value="waveform" :key="waveform"></v-radio>
@@ -23,7 +24,6 @@
         <p class="metadata">
             key: {{ selectedKey }}<br />
             midi: {{ midiMessage[0] }}, {{ midiMessage[1] }}, {{ midiMessage[2] }}<br/>
-            oscillator type: {{ selectedWaveform }}
         </p>
         <p>
             <br>
