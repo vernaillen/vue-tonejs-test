@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.4",
+    "p5": "^0.10.2",
     "tone": "^13.8.25",
     "vue": "^2.6.11",
     "vue-knob-control": "^1.6.0",
