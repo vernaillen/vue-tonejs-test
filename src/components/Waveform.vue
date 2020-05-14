@@ -6,6 +6,8 @@
 
 <script>
     import VueP5 from "vue-p5";
+    import "p5/lib/addons/p5.sound";
+
     export default {
         name: "Waveform",
         components: {
@@ -19,25 +21,38 @@
         data: () => ({
             lines: [],
             canvasHeight: 127,
-            canvasWidth: 50
+            canvasWidth: 50,
+            fft: null,
+            osc: null
         }),
         methods: {
             setup(sketch) {
-                sketch.createCanvas(this.canvasWidth, this.canvasHeight);
+                sketch.createCanvas(this.canvasWidth, this.canvasHeight)
+                this.fft = new sketch.fft
+                this.osc = new VueP5.p5.Oscillator('Sine')
             },
             draw(sketch) {
                 sketch.background(240, 240, 250);
 
-                // logo should be in the middle of the screen and rotated
-                sketch.translate(sketch.width / 2, sketch.height / 2);
-                sketch.resetMatrix();
-
-                for (let line of this.lines) {
-                    sketch.stroke(line.color);
-                    sketch.line(line.pmouseX, line.pmouseY, line.mouseX, line.mouseY);
+                /*let spectrum = this.fft.Analyser
+                sketch.noStroke();
+                sketch.fill(255, 0, 255);
+                for (let i = 0; i< spectrum.length; i++){
+                    let x = sketch.map(i, 0, spectrum.length, 0, this.canvasWidth);
+                    let h = -sketch.height + sketch.map(spectrum[i], 0, 255, this.canvasHeight, 0);
+                    sketch.rect(x, this.canvasHeight, this.canvasWidth / spectrum.length, h )
                 }
-                sketch.stroke(0);
-                sketch.line(0, 127 - this.input, this.canvasWidth, 127 - this.input);
+
+                let waveform = this.fft.Waveform
+                sketch.noFill();
+                sketch.beginShape();
+                sketch.stroke(20);
+                for (let i = 0; i < waveform.length; i++){
+                    let x = sketch.map(i, 0, waveform.length, 0, this.canvasWidth);
+                    let y = sketch.map( waveform[i], -1, 1, 0, this.canvasHeight);
+                    sketch.vertex(x,y);
+                }*/
+                sketch.endShape();
             },
             pushLine(line) {
                 let lines = this.lines;
