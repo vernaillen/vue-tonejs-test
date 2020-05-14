@@ -27,8 +27,8 @@
         </p>
         <p>
             <br>
-            vue-p5 test (currently only showing velocity):
-            <waveform :input="keyVelocity"></waveform>
+            waveform on p5 canvas:
+            <waveform :wave="waveformAnalyser"></waveform>
         </p>
     </v-container>
 </template>
@@ -38,6 +38,8 @@
     import Waveform from './Waveform'
     import Knob from './Knob'
     import Tone from 'tone'
+    import p5 from "p5/lib/p5";
+    import "p5/lib/addons/p5.sound";
     Tone.context.latencyHint = "fastest";
 
     export default {
@@ -55,21 +57,32 @@
                 selectedKey: '',
                 selectedWaveform: 'square',
                 midiMessage: [0, 0, 0],
-                oscFrequency: 0,
-                keyVelocity: 100
+                keyVelocity: 100,
+                fft: null
             }
         },
         computed: {
+            fftAnalyser: function () {
+                return new Tone.Analyser({
+                    type: 'fft'
+                }).toMaster()
+            },
+            waveformAnalyser: function () {
+                return new Tone.Analyser({
+                    type: 'waveform',
+                    size: 1024,
+                    smoothing: 0.4,
+                    maxDecibels: 10,
+                    minDecibels: -100
+                }).toMaster()
+            },
             synth: function () {
                 return new Tone.Synth({
                     oscillator : {
                         type : this.selectedWaveform,
                         frequency: this.oscFrequency
                     }
-                }).toMaster();
-            },
-            frequency: function () {
-                return this.synth.oscillator.frequency.value
+                }).fan(this.fftAnalyser, this.waveformAnalyser).toMaster();
             }
         },
         created() {
@@ -87,7 +100,7 @@
                     device.onmidimessage = this.onMessage.bind(device);
                 }
             })
-
+            this.fft = new p5.FFT()
         },
         methods: {
             isKeySelected: function (tone) {

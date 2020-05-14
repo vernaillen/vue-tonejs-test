@@ -5,60 +5,40 @@
 </template>
 
 <script>
-    import VueP5 from "vue-p5";
-    import "p5/lib/addons/p5.sound";
+    import VueP5 from 'vue-p5'
 
     export default {
         name: "Waveform",
         components: {
-            "vue-p5": VueP5
+            VueP5
         },
         props: {
-            input: {
+            wave: {
                 required: true
             }
         },
         data: () => ({
             lines: [],
-            canvasHeight: 127,
-            canvasWidth: 50,
-            fft: null,
-            osc: null
+            canvasHeight: 300,
+            canvasWidth: 1000
         }),
         methods: {
             setup(sketch) {
                 sketch.createCanvas(this.canvasWidth, this.canvasHeight)
-                this.fft = new sketch.fft
-                this.osc = new VueP5.p5.Oscillator('Sine')
             },
             draw(sketch) {
-                sketch.background(240, 240, 250);
+                sketch.background(0, 0, 0);
 
-                /*let spectrum = this.fft.Analyser
-                sketch.noStroke();
-                sketch.fill(255, 0, 255);
-                for (let i = 0; i< spectrum.length; i++){
-                    let x = sketch.map(i, 0, spectrum.length, 0, this.canvasWidth);
-                    let h = -sketch.height + sketch.map(spectrum[i], 0, 255, this.canvasHeight, 0);
-                    sketch.rect(x, this.canvasHeight, this.canvasWidth / spectrum.length, h )
-                }
-
-                let waveform = this.fft.Waveform
                 sketch.noFill();
                 sketch.beginShape();
-                sketch.stroke(20);
-                for (let i = 0; i < waveform.length; i++){
-                    let x = sketch.map(i, 0, waveform.length, 0, this.canvasWidth);
-                    let y = sketch.map( waveform[i], -1, 1, 0, this.canvasHeight);
+                sketch.stroke(255);
+                for (let i = 0; i < this.wave.size; i++){
+                    let x = sketch.map(i, 0, this.wave.size, 0, this.canvasWidth);
+                    let y = sketch.map( this.wave.getValue()[i], -1, 1, 0, this.canvasHeight);
                     sketch.vertex(x,y);
-                }*/
+                }
                 sketch.endShape();
             },
-            pushLine(line) {
-                let lines = this.lines;
-                lines.push(line);
-                this.lines = lines.slice(-100);
-            }
         }
     }
 </script>
