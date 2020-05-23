@@ -13,7 +13,7 @@
             VueP5
         },
         props: {
-            wave: {
+            analyser: {
                 required: true
             }
         },
@@ -32,9 +32,9 @@
                 sketch.noFill();
                 sketch.beginShape();
                 sketch.stroke(255);
-                for (let i = 0; i < this.wave.size; i++){
-                    let x = sketch.map(i, 0, this.wave.size, 0, this.canvasWidth);
-                    let y = sketch.map( this.wave.getValue()[i], -1, 1, 0, this.canvasHeight);
+                for (let i = 0; i < this.analyser.size; i++){
+                    let x = sketch.map(i, 0, this.analyser.size, 0, this.canvasWidth);
+                    let y = sketch.map( this.analyser.getValue()[i], -1, 1, 0, this.canvasHeight);
                     sketch.vertex(x,y);
                 }
                 sketch.endShape();

@@ -26,9 +26,10 @@
             midi: {{ midiMessage[0] }}, {{ midiMessage[1] }}, {{ midiMessage[2] }}<br/>
         </p>
         <p>
+            <FFT :analyser="fftAnalyser"></FFT>
             <br>
-            waveform on p5 canvas:
-            <waveform :wave="waveformAnalyser"></waveform>
+            <waveform :analyser="waveformAnalyser"></waveform>
+            <br>
         </p>
     </v-container>
 </template>
@@ -36,6 +37,7 @@
 <script>
     import PianoKey from './PianoKey.vue'
     import Waveform from './Waveform'
+    import FFT from './FFT'
     import Knob from './Knob'
     import Tone from 'tone'
     import p5 from "p5/lib/p5";
@@ -47,6 +49,7 @@
         components: {
             PianoKey,
             Waveform,
+            FFT,
             Knob
         },
         data () {
@@ -55,7 +58,7 @@
                 tones: ['C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3', 'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4'],
                 waveforms: [ 'sine', 'square', 'triangle', 'sawtooth'],
                 selectedKey: '',
-                selectedWaveform: 'square',
+                selectedWaveform: 'sine',
                 midiMessage: [0, 0, 0],
                 keyVelocity: 100,
                 fft: null
@@ -64,6 +67,8 @@
         computed: {
             fftAnalyser: function () {
                 return new Tone.Analyser({
+                    size: 16384,
+                    smoothing: 0.8,
                     type: 'fft'
                 }).toMaster()
             },
@@ -71,7 +76,7 @@
                 return new Tone.Analyser({
                     type: 'waveform',
                     size: 1024,
-                    smoothing: 0.4,
+                    smoothing: 0.1,
                     maxDecibels: 10,
                     minDecibels: -100
                 }).toMaster()
