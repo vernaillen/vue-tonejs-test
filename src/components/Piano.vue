@@ -27,9 +27,12 @@
         </p>
         <p>
             <FFT :analyser="fftAnalyser"></FFT>
-            <br>
             <waveform :analyser="waveformAnalyser"></waveform>
-            <br>
+        </p>
+        <p>
+            <v-icon @click="startAudioPlayer">fas fa fa-play</v-icon>
+            <v-icon @click="stopAudioPlayer">fas fa-stop</v-icon>
+            <br/><br/><br/>
         </p>
     </v-container>
 </template>
@@ -58,15 +61,30 @@
                 selectedKey: '',
                 selectedWaveform: 'sine',
                 midiMessage: [0, 0, 0],
-                keyVelocity: 100,
+                keyVelocity: 100
             }
         },
         computed: {
+            audioPlayer: function () {
+                return new Tone.Player('https://api.soundcloud.com/tracks/672555005/stream?client_id=1745017edcfeb72a175c95614a1cc212')
+                    .fan(this.fftAnalyser, this.waveformAnalyser)
+                    .toMaster();
+            },
+            synth: function () {
+                return new Tone.Synth({
+                    oscillator : {
+                        type : this.selectedWaveform,
+                        frequency: this.oscFrequency
+                    }
+                }).fan(this.fftAnalyser, this.waveformAnalyser).toMaster();
+            },
             fftAnalyser: function () {
                 return new Tone.Analyser({
                     size: 16384,
                     smoothing: 0.8,
-                    type: 'fft'
+                    type: 'fft',
+                    maxDecibels: 10,
+                    minDecibels: -100
                 }).toMaster()
             },
             waveformAnalyser: function () {
@@ -77,14 +95,6 @@
                     maxDecibels: 10,
                     minDecibels: -100
                 }).toMaster()
-            },
-            synth: function () {
-                return new Tone.Synth({
-                    oscillator : {
-                        type : this.selectedWaveform,
-                        frequency: this.oscFrequency
-                    }
-                }).fan(this.fftAnalyser, this.waveformAnalyser).toMaster();
             }
         },
         created() {
@@ -102,13 +112,13 @@
                     device.onmidimessage = this.onMessage.bind(device);
                 }
             })
+            this.audioPlayer.autostart = false
         },
         methods: {
             isKeySelected: function (tone) {
                 return this.selectedKey == tone
             },
             soundOn: function (tone, velocity) {
-                console.log('tone: ' + tone)
                 this.synth.triggerAttack(tone, 0, velocity / 127)
                 this.selectedKey = tone
             },
@@ -153,6 +163,13 @@
             },
             updateKeyVelocity(value) {
                 this.keyVelocity = value
+            },
+            startAudioPlayer() {
+                this.audioPlayer.volume.value= 4
+                this.audioPlayer.start()
+            },
+            stopAudioPlayer() {
+                this.audioPlayer.stop()
             }
         }
     }

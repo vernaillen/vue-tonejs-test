@@ -18,21 +18,16 @@
             }
         },
         data: () => ({
-            canvasWidth: 1280,
-            canvasHeight: 720,
+            canvasHeight: 300,
+            canvasWidth: 1000,
             fftSize: 4410,
             zeroPadding: 1,
             outputSize: 4410,
-            sampleOutCount: 128,
+            sampleOutCount: 256,
             lowerHz: 20,
             higherHz: 20000
         }),
         computed: {
-            waveform: function () {
-                let waveform = new Float32Array(this.analyser._analyser.fftSize);
-                this.analyser._analyser.getFloatTimeDomainData(waveform);
-                return waveform
-            },
             audioCtx: function () {
                 return this.analyser.context
             }
@@ -47,29 +42,24 @@
                 sketch.beginShape();
                 sketch.stroke(255);
 
+                let waveform = new Float32Array(this.analyser._analyser.fftSize);
+                this.analyser._analyser.getFloatTimeDomainData(waveform);
+
                 let audioBuffer = new Array(this.outputSize).fill(0);
                 let norm = 0;
                 for (let i = 0; i < this.fftSize; i++) {
                     // Apply window function
                     let x = i * 2 / (this.fftSize-1) - 1;
                     let w = Math.cos(x*Math.PI/2) ** 2;
-                    audioBuffer[i] = this.waveform[i+(this.waveform.length-this.fftSize)] * w;
+                    audioBuffer[i] = waveform[i+(waveform.length-this.fftSize)] * w;
                     norm += w;
-                    if (audioBuffer[i] > 0) {
-                        console.log('audioBuffer[' + i + '] = ' + audioBuffer[i])
-                    }
                 }
-
                 audioBuffer = audioBuffer.map((x, _, y) => x * (y.length/norm));
                 let spectrum = this.calcFFT(audioBuffer);
 
                 this.calcSpectrum(spectrum).map((amp, i, arr) => {
-                    /*if (i > 40 && i < 50 && (arr.length != 128 || amp > 0)) {
-                        console.log(i + ': ' + arr.length + ', amp:' + amp + ', map: ' + this.map(amp, 0, 1, this.canvasHeight/2, this.canvasHeight))
-                        console.log("start line: " + this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length)
-                    }*/
-                    sketch.line(this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length, this.map(amp, 0, 1, this.canvasHeight/2, 0),
-                        this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length, this.map(amp, 0, 1, this.canvasHeight/2, this.canvasHeight));
+                    sketch.line(this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length, this.map(amp, 0, 0.5, this.canvasHeight/2, 0),
+                        this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length, this.map(amp, 0, 0.5, this.canvasHeight/2, this.canvasHeight));
                 });
 
                 sketch.endShape();

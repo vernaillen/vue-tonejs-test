@@ -14,9 +14,10 @@
     "vue": "^2.6.11",
     "vue-knob-control": "^1.6.0",
     "vue-p5": "^0.8.3",
-    "vuetify": "^2.2.25"
+    "vuetify": "^2.2.29"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.13.0",
     "@vue/cli-plugin-babel": "~4.3.0",
     "@vue/cli-plugin-eslint": "~4.3.0",
     "@vue/cli-service": "~4.3.0",
