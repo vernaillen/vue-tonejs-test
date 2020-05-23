@@ -40,8 +40,6 @@
     import FFT from './FFT'
     import Knob from './Knob'
     import Tone from 'tone'
-    import p5 from "p5/lib/p5";
-    import "p5/lib/addons/p5.sound";
     Tone.context.latencyHint = "fastest";
 
     export default {
@@ -61,7 +59,6 @@
                 selectedWaveform: 'sine',
                 midiMessage: [0, 0, 0],
                 keyVelocity: 100,
-                fft: null
             }
         },
         computed: {
@@ -105,7 +102,6 @@
                     device.onmidimessage = this.onMessage.bind(device);
                 }
             })
-            this.fft = new p5.FFT()
         },
         methods: {
             isKeySelected: function (tone) {
