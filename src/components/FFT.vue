@@ -6,7 +6,6 @@
 
 <script>
     import VueP5 from 'vue-p5'
-    import Tone from 'tone'
 
     export default {
         name: "FFT",
@@ -16,14 +15,11 @@
         props: {
             analyser: {
                 required: true
-            },
-            fft: {
-                required: true
             }
         },
         data: () => ({
             canvasWidth: 1280,
-            canvasHeight: 300,
+            canvasHeight: 720,
             fftSize: 4410,
             zeroPadding: 1,
             outputSize: 4410,
@@ -32,6 +28,11 @@
             higherHz: 20000
         }),
         computed: {
+            waveform: function () {
+                let waveform = new Float32Array(this.analyser._analyser.fftSize);
+                this.analyser._analyser.getFloatTimeDomainData(waveform);
+                return waveform
+            },
             audioCtx: function () {
                 return this.analyser.context
             }
@@ -40,44 +41,33 @@
             setup(sketch) {
                 sketch.createCanvas(this.canvasWidth, this.canvasHeight)
             },
-            get(url, callback) {
-                let request = new XMLHttpRequest();
-                request.onreadystatechange = function() {
-                    if (request.readyState === 4 && request.status === 200) {
-                        callback(request.responseText);
-                    }
-                }
-
-                request.open("GET", url, true);
-                request.send(null);
-            },
             draw(sketch) {
                 sketch.background(0, 0, 0);
                 sketch.noFill();
                 sketch.beginShape();
                 sketch.stroke(255);
 
-                  /*  t.forEach((i,o)=>{
-                        const r=Math.scale(o,0,t.length,0,e),
-                            s=Math.clamp(Math.scale(i,-100,0,0,n),0,n);
-                    }this._context.fillRect(r,n/2-s/2,2,s)  */
+                let audioBuffer = new Array(this.outputSize).fill(0);
+                let norm = 0;
+                for (let i = 0; i < this.fftSize; i++) {
+                    // Apply window function
+                    let x = i * 2 / (this.fftSize-1) - 1;
+                    let w = Math.cos(x*Math.PI/2) ** 2;
+                    audioBuffer[i] = this.waveform[i+(this.waveform.length-this.fftSize)] * w;
+                    norm += w;
+                    if (audioBuffer[i] > 0) {
+                        console.log('audioBuffer[' + i + '] = ' + audioBuffer[i])
+                    }
+                }
 
-                let t = this.fft.getValue()
-                console.log(t)
-                //let e = this.canvasWidth
-                //let n = this.canvasHeight
+                audioBuffer = audioBuffer.map((x, _, y) => x * (y.length/norm));
+                let spectrum = this.calcFFT(audioBuffer);
 
-                /*t.forEach((i,o)=>{
-                    //let r= Math.scale(o,0,t.length,0,e)
-                    //let s= Math.clamp(Math.scale(i,-100,0,0,n),0,n);
-                    console.log('i: ' + i + ', o: ' + o)
-                })*/
-
-                this.calcSpectrum(this.fft.getValue()).map((amp, i, arr) => {
-                    if (arr.length != 128 || amp > 0) {
+                this.calcSpectrum(spectrum).map((amp, i, arr) => {
+                    /*if (i > 40 && i < 50 && (arr.length != 128 || amp > 0)) {
                         console.log(i + ': ' + arr.length + ', amp:' + amp + ', map: ' + this.map(amp, 0, 1, this.canvasHeight/2, this.canvasHeight))
                         console.log("start line: " + this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length)
-                    }
+                    }*/
                     sketch.line(this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length, this.map(amp, 0, 1, this.canvasHeight/2, 0),
                         this.canvasWidth / arr.length / 2 + i * this.canvasWidth / arr.length, this.map(amp, 0, 1, this.canvasHeight/2, this.canvasHeight));
                 });
