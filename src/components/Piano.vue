@@ -34,6 +34,9 @@
             <v-icon @click="stopAudioPlayer">fas fa-stop</v-icon>
             <br/><br/><br/>
         </p>
+        <p>
+            <audio-motion :audio-node="audioPlayer" :audio-context="audioContext"/>
+        </p>
     </v-container>
 </template>
 
@@ -43,15 +46,22 @@
     import FFT from './FFT'
     import Knob from './Knob'
     import Tone from 'tone'
+    import AudioMotion from "./AudioMotion";
     Tone.context.latencyHint = "fastest";
 
     export default {
         name: 'piano',
         components: {
+            AudioMotion,
             PianoKey,
             Waveform,
             FFT,
             Knob
+        },
+        props: {
+            audioContext: {
+                required: true
+            }
         },
         data () {
             return {

@@ -22,18 +22,27 @@
     </v-app-bar>
 
     <v-content >
-      <piano></piano>
+      <piano :audio-context="audioContext"></piano>
     </v-content>
   </v-app>
 </template>
 
 <script>
 import Piano from './components/Piano'
+import Tone from 'tone'
 
 export default {
   name: 'App',
   components: {
     Piano
+  },
+  data () {
+    return {
+      audioContext: new AudioContext()
+    }
+  },
+  created() {
+    Tone.setContext(this.audioContext);
   }
 }
 </script>
